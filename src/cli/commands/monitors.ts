@@ -33,7 +33,7 @@ const MONITOR_TYPES: Record<string, string> = {
 };
 
 export function registerMonitors(program: Command): void {
-  const cmd = program.command("monitors").description("Manage monitors");
+  const cmd = program.command("monitors").alias("mon").description("Manage monitors");
 
   // --- list ---
   cmd
