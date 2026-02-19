@@ -58,13 +58,13 @@ export function registerMonitors(program: Command): void {
   // --- get ---
   cmd
     .command("get")
-    .description("Get monitor details")
-    .argument("<id>", "monitor ID")
-    .action(async (idStr: string, _options: unknown, sub: Command) => {
+    .description("Get monitor details (by ID or name substring)")
+    .argument("<query>", "monitor ID or name substring")
+    .action(async (query: string, _options: unknown, sub: Command) => {
       const ctx = await ctxFromCommand(sub);
-      const id = parseId(idStr);
       const client = await makeClient(ctx);
       try {
+        const id = resolveMonitor(query, client.getMonitors());
         const monitor = await client.getMonitor(id);
         writeOut(ctx, {
           human: formatMonitorDetail(monitor),
@@ -159,12 +159,12 @@ export function registerMonitors(program: Command): void {
   cmd
     .command("pause")
     .description("Pause a monitor")
-    .argument("<id>", "monitor ID")
-    .action(async (idStr: string, _options: unknown, sub: Command) => {
+    .argument("<query>", "monitor ID or name substring")
+    .action(async (query: string, _options: unknown, sub: Command) => {
       const ctx = await ctxFromCommand(sub);
-      const id = parseId(idStr);
       const client = await makeClient(ctx);
       try {
+        const id = resolveMonitor(query, client.getMonitors());
         await client.pauseMonitor(id);
         ctx.log.info(`Monitor ${id} paused`);
         writeOut(ctx, {
@@ -181,12 +181,12 @@ export function registerMonitors(program: Command): void {
   cmd
     .command("resume")
     .description("Resume a monitor")
-    .argument("<id>", "monitor ID")
-    .action(async (idStr: string, _options: unknown, sub: Command) => {
+    .argument("<query>", "monitor ID or name substring")
+    .action(async (query: string, _options: unknown, sub: Command) => {
       const ctx = await ctxFromCommand(sub);
-      const id = parseId(idStr);
       const client = await makeClient(ctx);
       try {
+        const id = resolveMonitor(query, client.getMonitors());
         await client.resumeMonitor(id);
         ctx.log.info(`Monitor ${id} resumed`);
         writeOut(ctx, {
@@ -203,12 +203,12 @@ export function registerMonitors(program: Command): void {
   cmd
     .command("delete")
     .description("Delete a monitor")
-    .argument("<id>", "monitor ID")
-    .action(async (idStr: string, _options: unknown, sub: Command) => {
+    .argument("<query>", "monitor ID or name substring")
+    .action(async (query: string, _options: unknown, sub: Command) => {
       const ctx = await ctxFromCommand(sub);
-      const id = parseId(idStr);
       const client = await makeClient(ctx);
       try {
+        const id = resolveMonitor(query, client.getMonitors());
         await client.deleteMonitor(id);
         ctx.log.info(`Monitor ${id} deleted`);
         writeOut(ctx, {
@@ -226,6 +226,22 @@ function parseId(s: string): number {
   const n = parseInt(s, 10);
   if (!Number.isFinite(n) || n < 1) throw new CliError(`Invalid monitor ID: ${s}`, { exitCode: 2 });
   return n;
+}
+
+/** Resolve a query to a monitor ID — numeric ID passes through, otherwise substring match on name. */
+function resolveMonitor(query: string, monitors: MonitorRecord[]): number {
+  const n = parseInt(query, 10);
+  if (Number.isFinite(n) && n >= 1) return n;
+
+  const q = query.toLowerCase();
+  const matches = monitors.filter((m) => String(m.name ?? "").toLowerCase().includes(q));
+
+  if (matches.length === 0) throw new CliError(`No monitor matching "${query}"`, { exitCode: 2 });
+  if (matches.length > 1) {
+    const names = matches.map((m) => `  ${String(m.id).padStart(4)}  ${m.name}`).join("\n");
+    throw new CliError(`Ambiguous query "${query}" — matches ${matches.length} monitors:\n${names}`, { exitCode: 2 });
+  }
+  return matches[0]!.id as number;
 }
 
 function formatTable(monitors: MonitorRecord[]): string {

@@ -2,21 +2,18 @@
 
 CLI for managing Uptime Kuma monitors, notifications, status pages, maintenance, and tags.
 
-- **Instance:** `https://uptime.rwhl.se`
-- **Credentials:** Bitwarden → "Uptime Kuma" (username: `vforsh`)
-
 ## Quick Start
 
 ```bash
 # Auth (env vars or config)
-export KUMA_URL="https://uptime.rwhl.se"
-export KUMA_USERNAME="vforsh"
+export KUMA_URL="https://uptime.example.com"
+export KUMA_USERNAME="admin"
 export KUMA_PASSWORD="secret"
 
-# Or persist (password from Bitwarden)
-kuma cfg set url https://uptime.rwhl.se
-kuma cfg set username vforsh
-bw-get.sh password "Uptime Kuma" | kuma cfg set password
+# Or persist
+kuma cfg set url https://uptime.example.com
+kuma cfg set username admin
+echo "$KUMA_PASSWORD" | kuma cfg set password
 ```
 
 ## Commands
