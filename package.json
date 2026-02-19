@@ -1,0 +1,22 @@
+{
+  "name": "@vforsh/kuma",
+  "version": "0.1.0",
+  "description": "Bun CLI for Uptime Kuma monitoring",
+  "type": "module",
+  "bin": {
+    "kuma": "bin/kuma"
+  },
+  "scripts": {
+    "kuma": "bun run bin/kuma",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "picocolors": "^1.1.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "latest"
+  }
+}
