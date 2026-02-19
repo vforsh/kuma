@@ -12,18 +12,24 @@ export function registerInfo(program: Command): void {
       const client = await makeClient(ctx);
       try {
         const info = client.getInfo();
-        const version = info.version ?? "unknown";
-        const latestVersion = info.latestVersion;
+        const version = String(info.version ?? "unknown");
+        const tz = info.serverTimezone ? `${info.serverTimezone} (${info.serverTimezoneOffset ?? ""})` : null;
+        const rt = info.runtime as { platform?: string; arch?: string } | undefined;
+        const platform = rt ? `${rt.platform}/${rt.arch}${info.isContainer ? " (container)" : ""}` : null;
+        const db = info.dbType ? String(info.dbType) : null;
 
         writeOut(ctx, {
           human: [
-            `Version:  ${version}`,
-            latestVersion ? `Latest:   ${latestVersion}` : null,
+            `URL:       ${ctx.url}`,
+            `Version:   ${version}`,
+            tz ? `Timezone:  ${tz}` : null,
+            platform ? `Platform:  ${platform}` : null,
+            db ? `Database:  ${db}` : null,
           ]
             .filter(Boolean)
             .join("\n"),
-          plain: String(version),
-          json: { info },
+          plain: version,
+          json: { url: ctx.url, ...info },
         });
       } finally {
         client.disconnect();

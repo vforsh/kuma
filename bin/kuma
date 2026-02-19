@@ -2,3 +2,4 @@
 import { main } from "../src/index.ts";
 
 await main(process.argv);
+process.exit(process.exitCode ?? 0);
