@@ -124,6 +124,11 @@ export class KumaClient {
     return this.#notificationList ?? [];
   }
 
+  async testNotification(data: Record<string, unknown>): Promise<void> {
+    const res = await this.#call<CallbackResponse>("testNotification", data);
+    if (!res.ok) throw new CliError(`Failed to test notification: ${res.msg}`, { exitCode: 7 });
+  }
+
   // --- Status Pages ---
 
   getStatusPages(): Record<string, unknown>[] {
