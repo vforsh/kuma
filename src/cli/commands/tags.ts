@@ -7,6 +7,7 @@ export function registerTags(program: Command): void {
 
   cmd
     .command("list")
+    .alias("ls")
     .description("List all tags")
     .action(async (_options: unknown, sub: Command) => {
       const ctx = await ctxFromCommand(sub);

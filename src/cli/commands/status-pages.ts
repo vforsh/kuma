@@ -7,6 +7,7 @@ export function registerStatusPages(program: Command): void {
 
   cmd
     .command("list")
+    .alias("ls")
     .description("List all status pages")
     .action(async (_options: unknown, sub: Command) => {
       const ctx = await ctxFromCommand(sub);

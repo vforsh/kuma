@@ -7,6 +7,7 @@ export function registerMaintenance(program: Command): void {
 
   cmd
     .command("list")
+    .alias("ls")
     .description("List all maintenance windows")
     .action(async (_options: unknown, sub: Command) => {
       const ctx = await ctxFromCommand(sub);
