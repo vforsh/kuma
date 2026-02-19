@@ -8,6 +8,21 @@ import { redactPassword } from "../../util/redact.ts";
 const VALID_KEYS = ["url", "username", "password"] as const;
 type ConfigKey = (typeof VALID_KEYS)[number];
 
+const KEY_ALIASES: Record<string, ConfigKey> = {
+  server: "url",
+  user: "username",
+  uname: "username",
+  name: "username",
+  pw: "password",
+};
+
+function resolveKey(raw: string): ConfigKey {
+  if (VALID_KEYS.includes(raw as ConfigKey)) return raw as ConfigKey;
+  const resolved = KEY_ALIASES[raw];
+  if (resolved) return resolved;
+  throw new CliError(`Unknown key: ${raw}. Valid: ${VALID_KEYS.join(", ")}`, { exitCode: 2 });
+}
+
 export function registerConfig(program: Command): void {
   const cmd = program.command("config").alias("cfg").description("Manage local configuration");
 
@@ -41,13 +56,10 @@ export function registerConfig(program: Command): void {
     .argument("<key>", VALID_KEYS.join("|"))
     .argument("[value]", "value (avoid for password; use stdin)")
     .option("--from-env", "read from KUMA_PASSWORD env var (password only)")
-    .action(async (key: string, value: string | undefined, options: any, parent: Command) => {
+    .action(async (rawKey: string, value: string | undefined, options: any, parent: Command) => {
       await ctxFromCommand(parent);
 
-      if (!VALID_KEYS.includes(key as ConfigKey)) {
-        throw new CliError(`Unknown key: ${key}. Valid: ${VALID_KEYS.join(", ")}`, { exitCode: 2 });
-      }
-
+      const key = resolveKey(rawKey);
       const { config } = await loadConfig();
       const next: KumaConfig = { ...config };
 
@@ -80,16 +92,13 @@ export function registerConfig(program: Command): void {
     .command("unset")
     .description("Unset a config key")
     .argument("<key>", VALID_KEYS.join("|"))
-    .action(async (key: string, _options: unknown, parent: Command) => {
+    .action(async (rawKey: string, _options: unknown, parent: Command) => {
       await ctxFromCommand(parent);
 
-      if (!VALID_KEYS.includes(key as ConfigKey)) {
-        throw new CliError(`Unknown key: ${key}. Valid: ${VALID_KEYS.join(", ")}`, { exitCode: 2 });
-      }
-
+      const key = resolveKey(rawKey);
       const { config } = await loadConfig();
       const next: KumaConfig = { ...config };
-      delete next[key as ConfigKey];
+      delete next[key];
       const { path } = await saveConfig(next);
       process.stdout.write(`${path}\n`);
     });
