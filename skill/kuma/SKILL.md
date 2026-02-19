@@ -1,6 +1,14 @@
-# kuma — Uptime Kuma CLI
+---
+name: kuma
+description: >
+  CLI for Uptime Kuma server monitoring. Use when the user wants to: check monitor
+  status, add/pause/resume/delete monitors, list notifications or status pages,
+  view server info, or manage Uptime Kuma configuration. Trigger on mentions of
+  "kuma", "uptime kuma", "monitors", or monitoring-related tasks targeting an
+  Uptime Kuma instance.
+---
 
-CLI for managing Uptime Kuma monitors, notifications, status pages, maintenance, and tags.
+# kuma — Uptime Kuma CLI
 
 ## Quick Start
 
