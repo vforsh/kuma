@@ -6,6 +6,14 @@
   "bin": {
     "kuma": "bin/kuma"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "kuma": "bun run bin/kuma",
     "typecheck": "tsc -p tsconfig.json --noEmit"

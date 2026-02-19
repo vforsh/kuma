@@ -2,11 +2,17 @@
 
 Bun CLI for Uptime Kuma monitoring.
 
-## Install (dev)
+## Install
 
 ```bash
-bun install
-./bin/kuma --help
+bunx @vforsh/kuma --help
+```
+
+Or install globally:
+
+```bash
+bun install -g @vforsh/kuma
+kuma --help
 ```
 
 ## Auth
